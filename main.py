@@ -5,18 +5,20 @@ import matplotlib as mp
 import outputNode
 
 '''rewrite of spongegar ANN'''
-
-
+loop = 0
+setIndex = 0
+learning = 0.0001
 error = 0
-
-nodes = 4
+grace = 0.01
+nodes = 1 
 dataset = ds.dataSet(1000)
 dataset.split()
+rmse = 0
 
 deltas = [-error]
 np.random.seed(1)
-numInput = 2
-output = numInput * 2
+numInput = dataset.trainingSet[0]
+expected = numInput * 2
 
 #Build hidden Nodes
 
@@ -39,17 +41,31 @@ def sigmoid(x):
 
 def error(answer):
     error = answer - expected
+    return error
 
 def calcDeltas():
-    deltas = [-error]
+    deltas = [-1 * error(calcResult())]
     for e in range(nodes):
-        deltas.append(deltas[0] * secondLayer[e])
+        deltas.append(deltas[0] * secondLayer[e].weight)
+    return deltas
 
 def update():
     for x in range(nodes):
         for y in range(2):
-            hiddenNodes[y][x].updateWeight(numInput, deltas[x+1], secondLayer[x])
+            hiddenNodes[y][x].updateWeight(numInput, calcDeltas()[x+1], learning)
+        secondLayer[x].updateWeight(numInput, deltas[0], learning)
 
 def calcResult():
     result = 0
+    for x in range(nodes):
+        result = secondLayer[x].weight * outputs[x].output(numInput, hiddenNodes[0][x].weight, 2, hiddenNodes[1][x].weight)
+    return result
 
+while abs(error(calcResult())) > grace:
+    for t in range(len(dataset.trainingSet)):
+        numinput = dataset.trainingSet[t]
+    update()
+    if loop % 10 == 0:
+        rmse = np.sqrt(np.mean((error(calcResult())**2)))
+        print(rmse)
+    loop += 1
