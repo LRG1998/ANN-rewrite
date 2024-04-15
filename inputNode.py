@@ -1,0 +1,2 @@
+class inputNode():
+    pass

@@ -1,10 +1,13 @@
-import random
 import numpy as np
 
 
 class hiddenNode():
+    np.random.seed(4)
     def __init__(self):
-        self.weight = random.uniform(-1,1)
+        self.weight = np.random.uniform(-1,1)
+
+    def updateWeight(self, x1, dn, l):
+        self.weight += l * x1 * dn
 
 
 # function to remember for updating weights is hn = l*x1*dn * hn this will be the hidden node
