@@ -15,3 +15,6 @@ class dataSet():
                 self.trainingSet.append(self.arr[i])
             else:
                 self.testingSet.append(self.arr[i])
+    def normalize(self):
+        for i in range(len(self.trainingSet)):
+            self.trainingSet[i] = (self.trainingSet[i] - np.min(self.trainingSet))/(np.max(self.trainingSet) - np.min(self.trainingSet))

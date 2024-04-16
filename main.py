@@ -14,11 +14,12 @@ nodes = 1
 dataset = ds.dataSet(1000)
 dataset.split()
 rmse = 0
-
+dataset.normalize()
 deltas = [-error]
 np.random.seed(1)
 numInput = dataset.trainingSet[0]
 expected = numInput * 2
+
 
 #Build hidden Nodes
 
@@ -60,12 +61,28 @@ def calcResult():
     for x in range(nodes):
         result = secondLayer[x].weight * outputs[x].output(numInput, hiddenNodes[0][x].weight, 2, hiddenNodes[1][x].weight)
     return result
+def train():
+    loop = 0
+    fileoutput = open("output.csv", "w")
+    while abs(error(calcResult())) > grace:
+        for t in range(len(dataset.trainingSet)):
+            numinput = dataset.trainingSet[t]
+        update()
+        if loop % 100 == 0:
+            rmse = np.sqrt(np.mean((error(calcResult())**2)))
+            fileoutput.write(str(rmse) + ", " + "\n")
+        loop += 1
+    fileoutput.close()
+    for x in range(nodes):
+        for y in range(2):
+            print(hiddenNodes[y][x].weight)
 
-while abs(error(calcResult())) > grace:
-    for t in range(len(dataset.trainingSet)):
-        numinput = dataset.trainingSet[t]
-    update()
-    if loop % 10 == 0:
-        rmse = np.sqrt(np.mean((error(calcResult())**2)))
-        print(rmse)
-    loop += 1
+def test():
+    numInput = dataset.testingSet[0]
+    for x in range(len(dataset.testingSet)):
+        numInput = dataset.testingSet[x]
+        print(str(error(calcResult())) + ", " + str(numInput))
+
+train()
+
+test()
