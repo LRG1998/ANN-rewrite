@@ -9,6 +9,7 @@ from inputNode import inputNode
 '''rewrite of spongegar ANN'''
 
 
+
 inputval: float = input("What are you multiplying values by? ")
 inNode = inputNode()
 inNode.create(inputval)
@@ -93,6 +94,8 @@ def train():
     for x in range(nodes):
         for y in range(2):
             print(hiddenNodes[y][x].weight)
+
+    print(expected)
 
 def test():
     numInput = dataset.testingSet[0]
