@@ -1,4 +1,8 @@
+import numpy as np
 
-#TODO: Find a use for this
 class biasNode():
-    pass
+    def __init__(self):
+        self.weight = np.random.uniform(-1,1)
+
+    def updateBias(self, learning, delta):
+        self.weight += learning * delta * 1

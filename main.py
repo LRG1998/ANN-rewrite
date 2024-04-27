@@ -3,22 +3,29 @@ import hiddenNode
 import dataSet as ds
 import matplotlib as mp
 import outputNode
+import biasNode
+from inputNode import inputNode
 
 '''rewrite of spongegar ANN'''
+
+
+inputval: float = input("What are you multiplying values by? ")
+inNode = inputNode()
+inNode.create(inputval)
 loop = 0
 setIndex = 0
-learning = 0.0001
+learning = 0.001
 error = 0
 grace = 0.01
-nodes = 1 
+nodes = 4 
 dataset = ds.dataSet(1000)
 dataset.split()
-rmse = 0
+rmse = 1
 dataset.normalize()
 deltas = [-error]
-np.random.seed(1)
 numInput = dataset.trainingSet[0]
-expected = numInput * 2
+expected = numInput * float(inNode.getValue())
+print(expected)
 
 
 #Build hidden Nodes
@@ -29,8 +36,14 @@ for x in range(nodes):
         hiddenNodes[y][x] = hiddenNode.hiddenNode()
 #Building the second layer
 secondLayer = []
-for x in range(nodes):
+for x in range(nodes+1):
     secondLayer.append(hiddenNode.hiddenNode())
+
+print(len(secondLayer))
+#Building Bias nodes
+biasNodes = []
+for x in range(nodes):
+    biasNodes.append(biasNode.biasNode())
 
 outputs = []
 for x in range(nodes):
@@ -55,11 +68,12 @@ def update():
         for y in range(2):
             hiddenNodes[y][x].updateWeight(numInput, calcDeltas()[x+1], learning)
         secondLayer[x].updateWeight(numInput, deltas[0], learning)
+        biasNodes[x].updateBias(learning, calcDeltas()[x+1])
 
 def calcResult():
     result = 0
     for x in range(nodes):
-        result = secondLayer[x].weight * outputs[x].output(numInput, hiddenNodes[0][x].weight, 2, hiddenNodes[1][x].weight)
+        result = secondLayer[x].weight * outputs[x].output(numInput, hiddenNodes[0][x].weight, 2, hiddenNodes[1][x].weight) - secondLayer[nodes].weight
     return result
 def train():
     loop = 0
@@ -70,8 +84,11 @@ def train():
         update()
         if loop % 100 == 0:
             rmse = np.sqrt(np.mean((error(calcResult())**2)))
-            fileoutput.write(str(rmse) + ", " + "\n")
+            fileoutput.write(str(rmse) + "\n")
+            print(calcResult())
         loop += 1
+        if loop >= 30000:
+            break
     fileoutput.close()
     for x in range(nodes):
         for y in range(2):
@@ -84,5 +101,3 @@ def test():
         print(str(error(calcResult())) + ", " + str(numInput))
 
 train()
-
-test()

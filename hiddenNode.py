@@ -6,6 +6,7 @@ class hiddenNode():
     def __init__(self):
         self.weight = np.random.uniform(-1,1)
 
+
     def updateWeight(self, x1, dn, l):
         self.weight += l * x1 * dn
 
