@@ -15,10 +15,10 @@ inNode = inputNode()
 inNode.create(inputval)
 loop = 0
 setIndex = 0
-learning = 0.001
+learning = 0.00001
 error = 0
-grace = 0.01
-nodes = 4 
+grace = 0.1
+nodes = 5 
 dataset = ds.dataSet(1000)
 dataset.split()
 rmse = 1
@@ -26,7 +26,7 @@ dataset.normalize()
 deltas = [-error]
 numInput = dataset.trainingSet[0]
 expected = numInput * float(inNode.getValue())
-print(expected)
+
 
 
 #Build hidden Nodes
@@ -40,7 +40,6 @@ secondLayer = []
 for x in range(nodes+1):
     secondLayer.append(hiddenNode.hiddenNode())
 
-print(len(secondLayer))
 #Building Bias nodes
 biasNodes = []
 for x in range(nodes):
@@ -59,7 +58,7 @@ def error(answer):
     return error
 
 def calcDeltas():
-    deltas = [-1 * error(calcResult())]
+    deltas = [-1 * error(calcResult(numInput))]
     for e in range(nodes):
         deltas.append(deltas[0] * secondLayer[e].weight)
     return deltas
@@ -71,36 +70,42 @@ def update():
         secondLayer[x].updateWeight(numInput, deltas[0], learning)
         biasNodes[x].updateBias(learning, calcDeltas()[x+1])
 
-def calcResult():
+def calcResult(numIn):
     result = 0
     for x in range(nodes):
-        result = secondLayer[x].weight * outputs[x].output(numInput, hiddenNodes[0][x].weight, 2, hiddenNodes[1][x].weight) - secondLayer[nodes].weight
+        result += secondLayer[x].weight * outputs[x].output(numIn, hiddenNodes[0][x].weight, 2, hiddenNodes[1][x].weight) + (1 * biasNodes[0].weight)
     return result
 def train():
     loop = 0
     fileoutput = open("output.csv", "w")
-    while abs(error(calcResult())) > grace:
+    while abs(error(calcResult(numInput))) > grace:
         for t in range(len(dataset.trainingSet)):
             numinput = dataset.trainingSet[t]
         update()
+        print(calcResult(numInput))
         if loop % 100 == 0:
-            rmse = np.sqrt(np.mean((error(calcResult())**2)))
+            rmse = np.sqrt(np.mean((error(calcResult(numInput))**2)))
             fileoutput.write(str(rmse) + "\n")
-            print(calcResult())
+            print(rmse)
         loop += 1
-        if loop >= 30000:
+        if loop >= 300000:
             break
     fileoutput.close()
     for x in range(nodes):
         for y in range(2):
             print(hiddenNodes[y][x].weight)
 
-    print(expected)
 
 def test():
     numInput = dataset.testingSet[0]
     for x in range(len(dataset.testingSet)):
         numInput = dataset.testingSet[x]
-        print(str(error(calcResult())) + ", " + str(numInput))
+        expected = numInput * float(inNode.getValue())
+        print(str(numInput) + " , " + str(expected) + ", " + str(error(calcResult(numInput))))
+        rmse = np.sqrt(np.mean((error(calcResult(numInput))**2)))
+        print(rmse)
+        
+
 
 train()
+test()
