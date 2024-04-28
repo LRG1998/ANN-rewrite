@@ -4,7 +4,7 @@ class dataSet():
     def __init__(self, setLength):
         self.arr = []
         while len(self.arr) < setLength:
-            self.arr.append(np.random.uniform(-5,5))
+            self.arr.append(np.random.uniform(0,np.pi*4))
         
 
     def split(self):
