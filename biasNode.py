@@ -5,4 +5,4 @@ class biasNode():
         self.weight = np.random.uniform(-1,1)
 
     def updateBias(self, learning, delta):
-        self.weight += learning * delta * 1
+        self.weight += learning * delta

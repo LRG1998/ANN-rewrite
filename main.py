@@ -15,10 +15,10 @@ inNode = inputNode()
 inNode.create(inputval)
 loop = 0
 setIndex = 0
-learning = 0.00001
+learning = 0.0000001
 error = 0
-grace = 0.1
-nodes = 5 
+grace = 0.01
+nodes = 80 
 dataset = ds.dataSet(1000)
 dataset.split()
 rmse = 1
@@ -42,7 +42,7 @@ for x in range(nodes+1):
 
 #Building Bias nodes
 biasNodes = []
-for x in range(nodes):
+for x in range(nodes+1):
     biasNodes.append(biasNode.biasNode())
 
 outputs = []
@@ -68,12 +68,14 @@ def update():
         for y in range(2):
             hiddenNodes[y][x].updateWeight(numInput, calcDeltas()[x+1], learning)
         secondLayer[x].updateWeight(numInput, deltas[0], learning)
+        biasNodes[-1].updateBias(learning, calcDeltas()[0])
         biasNodes[x].updateBias(learning, calcDeltas()[x+1])
+    
 
 def calcResult(numIn):
     result = 0
     for x in range(nodes):
-        result += secondLayer[x].weight * outputs[x].output(numIn, hiddenNodes[0][x].weight, 2, hiddenNodes[1][x].weight) + (1 * biasNodes[0].weight)
+        result += secondLayer[x].weight * outputs[x].output(numIn, hiddenNodes[0][x].weight, 2, hiddenNodes[1][x].weight, biasNodes[x].weight) + biasNodes[-1].weight
     return result
 def train():
     loop = 0
@@ -82,18 +84,15 @@ def train():
         for t in range(len(dataset.trainingSet)):
             numinput = dataset.trainingSet[t]
         update()
-        print(calcResult(numInput))
         if loop % 100 == 0:
             rmse = np.sqrt(np.mean((error(calcResult(numInput))**2)))
             fileoutput.write(str(rmse) + "\n")
             print(rmse)
         loop += 1
-        if loop >= 300000:
+        if loop >= 3000000000:
             break
     fileoutput.close()
-    for x in range(nodes):
-        for y in range(2):
-            print(hiddenNodes[y][x].weight)
+
 
 
 def test():
@@ -101,11 +100,8 @@ def test():
     for x in range(len(dataset.testingSet)):
         numInput = dataset.testingSet[x]
         expected = numInput * float(inNode.getValue())
-        print(str(numInput) + " , " + str(expected) + ", " + str(error(calcResult(numInput))))
+        print(str(numInput) + " , " + str(expected) + ", " + str(calcResult(numInput)))
         rmse = np.sqrt(np.mean((error(calcResult(numInput))**2)))
-        print(rmse)
-        
 
 
 train()
-test()
