@@ -16,8 +16,8 @@ loop = 0
 setIndex = 0
 learning = 0.0001
 error = 0
-grace = 0.001
-nodes = 200
+grace = 0.00001
+nodes = 80
 dataset = ds.dataSet(1000)
 dataset.split()
 rmse = 1
