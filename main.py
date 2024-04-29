@@ -16,8 +16,8 @@ loop = 0
 setIndex = 0
 learning = 0.0001
 error = 0
-grace = 0.01
-nodes = 6 
+grace = 0.001
+nodes = 200
 dataset = ds.dataSet(1000)
 dataset.split()
 rmse = 1
@@ -71,7 +71,7 @@ def update():
 def calcResult(inVal):
     result = 0
     for x in range(nodes):
-        result = secondLayer[x].weight * outputs[x].output(inVal, hiddenNodes[0][x].weight, 2, hiddenNodes[1][x].weight) - (1*biasNodes[0].weight)
+        result += secondLayer[x].weight * outputs[x].output(inVal, hiddenNodes[0][x].weight, 2, hiddenNodes[1][x].weight) - (1*biasNodes[0].weight)
     return result
 def train():
     loop = 0
@@ -100,7 +100,7 @@ def test():
     for x in range(len(dataset.testingSet)):
         numInput = dataset.testingSet[x]
         expected = np.sin(2*numInput)
-        sinFile.write(str(calcResult(numInput))+"\n")
+        sinFile.write(str(calcResult(numInput))+"," + str(numInput) + "\n")
     sinFile.close()
 
 train()
