@@ -2,7 +2,6 @@ import numpy as np
 
 
 class hiddenNode():
-    np.random.seed(4)
     def __init__(self):
         self.weight = np.random.uniform(-1,1)
 
